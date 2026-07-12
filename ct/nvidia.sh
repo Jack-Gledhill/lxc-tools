@@ -84,7 +84,7 @@ install_driver() {
     local filepath="$PWD/${filename}"
 
     echo "[INFO] Downloading NVIDIA driver version ${DRIVER_VERSION}..."
-    curl -fsSL "https://us.download.nvidia.com/XFree86/Linux-x86_64/${DRIVER_VERSION}/${filename}" -o "${filepath}"
+    curl -fsSL https://us.download.nvidia.com/XFree86/Linux-x86_64/"${DRIVER_VERSION}"/"${filename}" -o "${filepath}"
     chmod +x "${filepath}"
     echo "[INFO] Downloaded NVIDIA driver version ${DRIVER_VERSION} and saved to ${filepath}"
 
