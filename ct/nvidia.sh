@@ -98,7 +98,7 @@ install_driver() {
 
 install_nct_repo() {
     echo "[INFO] Configuring NVIDIA Container Toolkit deb repository..."
-    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --yes --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
     cat > /etc/apt/sources.list.d/nvidia.sources <<EOF
 Types: deb
 URIs: https://nvidia.github.io/libnvidia-container/stable/deb/amd64
