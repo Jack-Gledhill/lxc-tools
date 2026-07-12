@@ -119,6 +119,7 @@ install_nct() {
         libnvidia-container1="${NCT_VERSION}"
 
     nvidia-ctk runtime configure --runtime=docker
+    nvidia-ctk config --set nvidia-container-cli.no-cgroups --in-place
     systemctl restart docker
     echo "[INFO] Successfully installed NVIDIA Container Toolkit version ${NCT_VERSION}"
 }
