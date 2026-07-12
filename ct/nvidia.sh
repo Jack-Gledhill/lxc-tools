@@ -86,8 +86,7 @@ install_prerequisites() {
     apt-get install -y \
         curl \
         gnupg2 \
-        ca-certificates \
-        > /dev/null
+        ca-certificates
 }
 
 install_driver() {
@@ -100,7 +99,7 @@ install_driver() {
     msg_ok "Downloaded NVIDIA driver version ${DRIVER_VERSION} and saved to ${filepath}"
 
     msg_info "Running NVIDIA driver installer, this may take a while..."
-    bash "${filepath}" --no-kernel-modules -q --ui=none > /dev/null
+    bash "${filepath}" --no-kernel-modules -q --ui=none
     msg_ok "Driver installer finished"
 
     rm "${filepath}"
@@ -122,13 +121,12 @@ EOF
 
 install_nct() {
     msg_info "Installing NVIDIA Container Toolkit version ${NCT_VERSION}..."
-    apt-get update > /dev/null
+    apt-get update
     apt-get install -y \
         nvidia-container-toolkit="${NCT_VERSION}" \
         nvidia-container-toolkit-base="${NCT_VERSION}" \
         libnvidia-container-tools="${NCT_VERSION}" \
-        libnvidia-container1="${NCT_VERSION}" \
-        > /dev/null
+        libnvidia-container1="${NCT_VERSION}"
 
     nvidia-ctk runtime configure --runtime=docker
     systemctl restart docker
