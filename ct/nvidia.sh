@@ -83,7 +83,7 @@ done
 eval set -- "$PARAMS"
 
 install_prerequisites() {
-    apt-get install -y \
+    apt-get install -qq -y \
         curl \
         gnupg2 \
         ca-certificates
@@ -121,8 +121,8 @@ EOF
 
 install_nct() {
     msg_info "Installing NVIDIA Container Toolkit version ${NCT_VERSION}..."
-    apt-get update
-    apt-get install -y \
+    apt-get update -qq
+    apt-get install -qq -y \
         nvidia-container-toolkit="${NCT_VERSION}" \
         nvidia-container-toolkit-base="${NCT_VERSION}" \
         libnvidia-container-tools="${NCT_VERSION}" \
