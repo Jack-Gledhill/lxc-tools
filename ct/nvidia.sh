@@ -9,16 +9,6 @@
 
 set -eo pipefail # Stops execution if any command fails
 
-# -----------------------------------------------------------------------------------------
-# Copyright (c) 2021-2026 community-scripts ORG
-# License: MIT | https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/LICENSE
-# shellcheck source=https://github.com/community-scripts/ProxmoxVE/raw/refs/heads/main/misc/core.func
-source <(curl -fsSL https://github.com/community-scripts/ProxmoxVE/raw/refs/heads/main/misc/core.func)
-load_functions
-# shellcheck source=https://github.com/community-scripts/ProxmoxVE/raw/refs/heads/main/misc/tools.func
-source <(curl -fsSL https://github.com/community-scripts/ProxmoxVE/raw/refs/heads/main/misc/tools.func)
-# -----------------------------------------------------------------------------------------
-
 usage() {
     cat << EOF
 usage: $0 [-d VERSION] [-n VERSION] [-h]
@@ -52,7 +42,7 @@ while (( "$#" )); do
                 DRIVER_VERSION=$2
                 shift 2
             else
-                msg_error "Argument for $1 is missing"
+                echo "[ERROR] Argument for $1 is missing"
                 exit 1
             fi
             ;;
@@ -61,7 +51,7 @@ while (( "$#" )); do
                 NCT_VERSION=$2
                 shift 2
             else
-                msg_error "Argument for $1 is missing"
+                echo "[ERROR] Argument for $1 is missing"
                 exit 1
             fi
             ;;
@@ -70,7 +60,7 @@ while (( "$#" )); do
             exit 1
             ;;
         -*|--*=)
-            msg_error "Unrecognised flag $1"
+            echo "[ERROR] Unrecognised flag $1"
             exit 1
             ;;
         *) # Preserve positional arguments
@@ -93,21 +83,21 @@ install_driver() {
     local filename="NVIDIA-Linux-x86_64-${DRIVER_VERSION}.run"
     local filepath="$PWD/${filename}"
 
-    msg_info "Downloading NVIDIA driver version ${DRIVER_VERSION}..."
-    curl_with_retry "https://us.download.nvidia.com/XFree86/Linux-x86_64/${DRIVER_VERSION}/${filename}" "${filepath}"
+    echo "[INFO] Downloading NVIDIA driver version ${DRIVER_VERSION}..."
+    curl "https://us.download.nvidia.com/XFree86/Linux-x86_64/${DRIVER_VERSION}/${filename}" "${filepath}"
     chmod +x "${filepath}"
-    msg_ok "Downloaded NVIDIA driver version ${DRIVER_VERSION} and saved to ${filepath}"
+    echo "[INFO] Downloaded NVIDIA driver version ${DRIVER_VERSION} and saved to ${filepath}"
 
-    msg_info "Running NVIDIA driver installer, this may take a while..."
+    echo "[INFO] Running NVIDIA driver installer, this may take a while..."
     bash "${filepath}" --no-kernel-modules -q --ui=none
-    msg_ok "Driver installer finished"
+    echo "[INFO] Driver installer finished"
 
     rm "${filepath}"
-    msg_ok "Cleaned up driver installation"
+    echo "[INFO] Cleaned up driver installation"
 }
 
 install_nct_repo() {
-    msg_info "Configuring NVIDIA Container Toolkit deb repository..."
+    echo "[INFO] Configuring NVIDIA Container Toolkit deb repository..."
     curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
     cat > /etc/apt/sources.list.d/nvidia.sources <<EOF
 Types: deb
@@ -116,11 +106,11 @@ Suites: /
 Components:
 Signed-By: /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 EOF
-    msg_ok "Container Toolkit repository ready"
+    echo "[INFO] Container Toolkit repository ready"
 }
 
 install_nct() {
-    msg_info "Installing NVIDIA Container Toolkit version ${NCT_VERSION}..."
+    echo "[INFO] Installing NVIDIA Container Toolkit version ${NCT_VERSION}..."
     apt-get update -qq
     apt-get install -qq -y \
         nvidia-container-toolkit="${NCT_VERSION}" \
@@ -130,19 +120,19 @@ install_nct() {
 
     nvidia-ctk runtime configure --runtime=docker
     systemctl restart docker
-    msg_ok "Successfully installed NVIDIA Container Toolkit version ${NCT_VERSION}"
+    echo "[INFO] Successfully installed NVIDIA Container Toolkit version ${NCT_VERSION}"
 }
 
 install_prerequisites
 
 if [ -z "${DRIVER_VERSION}" ]; then
-    msg_warn "No driver version given, installation will be skipped"
+    echo "[WARN] No driver version given, installation will be skipped"
 else
     install_driver
 fi
 
 if [ -z "${NCT_VERSION}" ]; then
-    msg_warn "No NVIDIA Container Toolkit version given, installation will be skipped"
+    echo "[WARN] No NVIDIA Container Toolkit version given, installation will be skipped"
 else
     install_nct_repo
     install_nct
